@@ -22,7 +22,7 @@
                 requests
               ]))
             ];
-            shellHook = "zsh && exit 0";
+            # shellHook = "zsh && exit 0";
           };
       };
       legacyPackages = {

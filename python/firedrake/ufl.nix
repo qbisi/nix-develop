@@ -1,19 +1,30 @@
 { lib, fetchFromGitHub, pythonPackages }:
 
 pythonPackages.buildPythonPackage rec {
-  version = "8c17257d325f5f040ad1cb74b866956ad42427ca";
+  version = "20240829.0";
   name = "firedrake-ufl-${version}";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "ufl";
-    rev = "${version}";
-    sha256 = "1ryjq5sknaw92z3zrrnfqcvkga3g071bgjf8j42acsh4iw4g6yg1";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-ofAFGc9IfZ8sQRuwsUg2zkLojTIryxwcQ+4l6jPfXD4=";
   };
 
-  propagatedBuildInputs = [
-    pythonPackages.numpy
-    pythonPackages.six
+  build-system = with pythonPackages; [ pip setuptools ];
+
+  dependencies = with pythonPackages; [
+    numpy
+  ];
+
+  pythonImportsCheck = [
+    "ufl"
+    "ufl.algorithms"
+    "ufl.core"
+    "ufl.corealg"
+    "ufl.formatting"
+    "ufl.utils"
   ];
 
   meta = with lib; {

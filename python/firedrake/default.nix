@@ -3,20 +3,22 @@
 let
   callPackage = newScope firedrake;
   firedrake = rec {
-    inherit callPackage ;
+    inherit callPackage;
 
     python = python3;
     pythonPackages = python.pkgs;
 
     # Forked and unavailable packages required by firedrake and its dependencies
     ufl = callPackage ./ufl.nix { };
-    # fiat      = callPackage ./fiat.nix      { };
-    # finat     = callPackage ./finat.nix     { };
-    # tsfc      = callPackage ./tsfc.nix      { };
-    # pyop2     = callPackage ./pyop2.nix     { };
+    recursivenodes = callPackage ./recursivenodes.nix { };
+    fiat = callPackage ./fiat.nix { };
+    finat = callPackage ./finat.nix { };
+    tsfc = callPackage ./tsfc.nix { };
+    pyop2     = callPackage ./pyop2.nix     { };
     # petsc     = callPackage ./petsc.nix     { };
     # petsc4py  = callPackage ./petsc4py.nix  { };
-    # coffee    = callPackage ./coffee.nix    { };
+    loopy = callPackage ./loopy.nix { };
+    coffee = callPackage ./coffee.nix { };
     # firedrake = callPackage ./firedrake.nix { };
     # pulp      = callPackage ./pulp.nix      { };
     # sowing    = callPackage ./sowing.nix    { };

@@ -1,25 +1,33 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, coffee, ufl, fiat, finat }:
+{ lib
+, callPackage
+, fetchFromGitHub
+, pythonPackages
+, loopy
+# , finat
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "ee5670ab1ad90aaf8f550de01255c6752583255d";
+  version = "20240829.0";
   name = "firedrake-tsfc-${version}";
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "tsfc";
-    rev = "${version}";
-    sha256 = "07v5v1nhcywn2rpdr0380ck120ppzlvpfknmjh1rss6xkzf2s9lf";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-P3bANMPvPoqJiuy1nd6wpyd7PxN1vsdmglwu2UKtwWk=";
   };
 
-  propagatedBuildInputs = [
+  dependencies = [
     pythonPackages.numpy
-    pythonPackages.singledispatch
-    pythonPackages.six
-    coffee
-    ufl
-    fiat
-    finat
+    loopy
+    # finat
+  ];
+
+  pythonImportsCheck = [
+    "gem"
+    # "tsfc"
+    # loopy Permission denied: '/homeless-shelter'
+    # "tsfc.kernel_interface"
   ];
 
   meta = with lib; {

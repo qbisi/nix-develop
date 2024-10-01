@@ -24,7 +24,7 @@ pythonPackages.buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    homepage = "https://bitbucket.org/petsc/petsc4py/";
+    homepage = "https://gitlab.com/petsc/petsc4py";
     description = "Python bindings for PETSc.";
     license = licenses.bsd2;
   };

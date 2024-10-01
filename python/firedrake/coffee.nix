@@ -1,23 +1,29 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, pulp }:
+{ lib
+, callPackage
+, fetchFromGitHub
+, pythonPackages
+, pulp
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "bdbc5fc0a8dfc45683489c6835c3c00cb27c0427";
+  version = "20230510.0";
   name = "firedrake-COFFEE-${version}";
 
   src = fetchFromGitHub {
     owner = "coneoproject";
     repo = "COFFEE";
-    rev = "${version}";
-    sha256 = "0b4jgnz05n6lapcnljpnq1p5z6j4bbdnq0mm3c53gzx4r47rkgyk";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-av3JLE6o4v3VhJKMm5FiWjtdb3mRBZ1Xhjz2CkUCa5A=";
   };
 
-  propagatedBuildInputs = [
-    pythonPackages.networkx
-    pythonPackages.numpy
-    pythonPackages.six
+  dependencies = with pythonPackages; [
+    networkx
+    numpy
+    six
     pulp
   ];
+
+  pythonImportsCheck = [ "coffee" "coffee.visitors" ];
 
   meta = with lib; {
     homepage = "https://github.com/coneoproject/COFFEE";

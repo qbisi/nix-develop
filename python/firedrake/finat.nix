@@ -1,21 +1,33 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, fiat }:
+{ lib
+, callPackage
+, fetchFromGitHub
+, pythonPackages
+, fiat
+, ufl
+, tsfc
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "fecac5b4d4ecf4b02b1ee440bdc4a57bfa9f1d87";
+  version = "20240829.0";
   name = "FInAT-${version}";
 
   src = fetchFromGitHub {
     owner = "FInAT";
     repo = "FInAT";
-    rev = "${version}";
-    sha256 = "1ad7vzpvlwmx5pgmvj2v8s6n5kdrz02j7wzj25wn974a2ff6pvvd";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-ouqRC0pP37k124Bkmo2uwDuTBIlc0mphzyNxqzvct6g=";
   };
 
-  propagatedBuildInputs = [
+  dependencies = [
     pythonPackages.numpy
+    pythonPackages.symengine
+    pythonPackages.sympy
     fiat
+    ufl
+    tsfc
   ];
+
+  pythonImportsCheck = [ "finat" "finat.ufl" ];
 
   meta = with lib; {
     homepage = "https://github.com/FInAT/FInAT";
