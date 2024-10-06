@@ -25,6 +25,8 @@ pythonPackages.buildPythonPackage rec {
 
   pythonImportsCheck = [ "coffee" "coffee.visitors" ];
 
+  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+
   meta = with lib; {
     homepage = "https://github.com/coneoproject/COFFEE";
     description = "A COmpiler For Fast Expression Evaluation (COFFEE).";

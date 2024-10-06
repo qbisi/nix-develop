@@ -1,48 +1,63 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, openmpi, hdf5, libspatialindex
-, ufl, fiat, finat, tsfc, pyop2, petsc, petsc4py, coffee }:
+{ lib
+, fetchFromGitHub
+, pythonPackages
+, libspatialindex
+, libsupermesh
+, hdf5
+, mpi
+, ufl
+, fiat
+, finat
+, tsfc
+, pyop2
+, petsc
+, petsc4py
+, coffee
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "a967a34c0f05d3dbfb9be05825777da40a6195dc";
+  version = "20240829.0";
   name = "firedrake-${version}";
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "firedrake";
-    rev = "${version}";
-    sha256 = "0flj0ca3b3pmcnak058alx5kfhz0h7s3hz0q7qiciag9m8p6ccnl";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-CR6Aj4RdVvMkMDevJjY9Kl/brFI809DeOLDMXFyRkaQ=";
   };
 
-  buildInputs = [
-    openmpi
-    hdf5
+  build-system = with pythonPackages; [
+    mpi
     libspatialindex
-    pythonPackages.cython
-    pythonPackages.pytest_29
-    pythonPackages.pytest_xdist
-    pythonPackages.pylint
-    petsc
+    libsupermesh
+    cython
   ];
 
-  propagatedBuildInputs = [
-    pythonPackages.h5py
-    pythonPackages.six
-    pythonPackages.sympy
-    pythonPackages.psutil
-    pythonPackages.cachetools
-    pythonPackages.singledispatch
-    pythonPackages.ipython
-    pythonPackages.matplotlib
+  dependencies = with pythonPackages; [
+    hdf5
+    numpy
+    scipy
+    sympy
+    rtree
+    # h5py
+    # pythonPackages.six
+    # pythonPackages.sympy
+    # pythonPackages.psutil
+    # pythonPackages.cachetools
+    # pythonPackages.singledispatch
+    # pythonPackages.ipython
+    # pythonPackages.matplotlib
     ufl
     fiat
     finat
     tsfc
     pyop2
+    petsc
     petsc4py
     coffee
   ];
 
-  patches = [ ./firedrake-setup.patch ];
+  PETSC_DIR = "${petsc}";
 
   meta = with lib; {
     homepage = "http://www.firedrakeproject.org";

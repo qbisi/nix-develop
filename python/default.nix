@@ -17,9 +17,8 @@
           {
             packages = [
               (pkgs.python3.withPackages (python-pkgs: with python-pkgs; [
-                numpy
-                pandas
-                requests
+                  # config.legacyPackages.firedrake.petsc4py
+                  config.legacyPackages.firedrake.tsfc
               ]))
             ];
             # shellHook = "zsh && exit 0";

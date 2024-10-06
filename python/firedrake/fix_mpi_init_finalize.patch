@@ -1,0 +1,18 @@
+diff --git a/src/tests/test_main.cpp b/src/tests/test_main.cpp
+index f85dc18..a92fc03 100644
+--- a/src/tests/test_main.cpp
++++ b/src/tests/test_main.cpp
+@@ -68,11 +68,11 @@ extern "C" {
+ 
+ int main(int argc, char **argv) 
+ {
+-  MPI::Init(argc, argv);
++  MPI_Init(&argc, &argv);
+ 
+   TESTNAME();
+ 
+-  MPI::Finalize();
++  MPI_Finalize();
+ 
+   return 0;
+ }

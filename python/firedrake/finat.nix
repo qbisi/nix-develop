@@ -4,7 +4,7 @@
 , pythonPackages
 , fiat
 , ufl
-, tsfc
+, tsfc_0
 }:
 
 pythonPackages.buildPythonPackage rec {
@@ -18,16 +18,19 @@ pythonPackages.buildPythonPackage rec {
     sha256 = "sha256-ouqRC0pP37k124Bkmo2uwDuTBIlc0mphzyNxqzvct6g=";
   };
 
+  build-system = [ tsfc_0 ];
+
   dependencies = [
     pythonPackages.numpy
     pythonPackages.symengine
     pythonPackages.sympy
     fiat
     ufl
-    tsfc
   ];
 
   pythonImportsCheck = [ "finat" "finat.ufl" ];
+
+  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
 
   meta = with lib; {
     homepage = "https://github.com/FInAT/FInAT";
