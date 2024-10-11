@@ -13,6 +13,10 @@ let
           "--set PETSC_DIR ${firedrake.petsc}"
           "--set OMP_NUM_THREADS 1"
         ];
+        postBuild = ''
+          touch $out/bin/activate
+          chmod +x $out/bin/activate
+        '';
       });
   };
 in
