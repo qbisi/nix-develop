@@ -22,6 +22,8 @@ pythonPackages.buildPythonPackage rec {
 
   pythonImportsCheck = [ "recursivenodes" ];
 
+  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+
   meta = with lib; {
     homepage = "https://tisaac.gitlab.io/recursivenodes/";
     description = "Recursive, parameter-free, explicitly defined interpolation nodes for simplices.";

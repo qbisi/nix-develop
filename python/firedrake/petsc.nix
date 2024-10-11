@@ -1,53 +1,158 @@
-{ stdenv, callPackage, writeText, fetchFromGitHub, python, gfortran
-, openmpi, blas, liblapack, hdf5, netcdf, eigen
-, sowing, metis, hypre, parmetis, exodus }:
+{ lib
+, stdenv
+, fetchzip
+, cctools
+, gfortran
+, python3
+, blas
+, lapack
+, mpiSupport ? true
+, mpi
+, # generic mpi dependency
+  openssh
+, # required for openmpi tests
+  petsc-withp4est ? false
+, hdf5-support ? true
+, hdf5
+, metis
+, withMetis ? true
+, parmetis
+, withParmetis ? false
+, scalapack
+, withScalapack ? true
+, ptscotch
+, withPtScotch ? true
+, mumps
+, withMumps ? true
+, pkg-config
+, p4est
+, zlib
+, # propagated by p4est but required by petsc
+  petsc-optimized ? true
+, petsc-scalar-type ? "real"
+, petsc-precision ? "double"
+,
+}:
+
+# This version of PETSc does not support a non-MPI p4est build
+assert petsc-withp4est -> p4est.mpiSupport;
+
+# Package parmetis depend on metis and mpi support
+assert withParmetis -> (withMetis && mpiSupport);
 
 stdenv.mkDerivation rec {
-  version = "156a1856fd44f55220132393778f0fda1e6096e3";
-  name = "firedrake-petsc-${version}";
+  pname = "petsc";
+  version = "3.21.3";
 
-  src = fetchFromGitHub {
-    owner = "firedrakeproject";
-    repo = "petsc";
-    rev = "${version}";
-    sha256 = "1fmkd818idbiwbr6q9bmsxgwsc7igk13amfvb160llvsj32i93s9";
+  src = fetchzip {
+    url = "https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-${version}.tar.gz";
+    hash = "sha256-dxHa8JUJCN4zRIXMCx7gcvbzFH2SPtkJ377ssIevjgU=";
   };
 
-  buildInputs = [
-    sowing
-    metis
-    parmetis
-    hypre
-    exodus
-    python
+  strictDeps = true;
+  nativeBuildInputs = [
+    python3
     gfortran
-    openmpi
+    pkg-config
+  ] ++ lib.optional mpiSupport mpi ++ lib.optional (mpiSupport && mpi.pname == "openmpi") openssh;
+  buildInputs = [
     blas
-    liblapack
-    hdf5
-    netcdf
-    eigen
-  ];
+    lapack
+  ]
+  ++ lib.optional hdf5-support hdf5
+  ++ lib.optional petsc-withp4est p4est
+  ++ lib.optionals withParmetis [ metis parmetis ]
+  ++ lib.optional withScalapack scalapack
+  ++ lib.optional withMumps mumps
+  ++ lib.optional withPtScotch ptscotch;
 
-  postPatch = "patchShebangs .";
+  prePatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    substituteInPlace config/install.py \
+      --replace /usr/bin/install_name_tool ${cctools}/bin/install_name_tool
+  '';
+
+  # Both OpenMPI and MPICH get confused by the sandbox environment and spew errors like this (both to stdout and stderr):
+  #     [hwloc/linux] failed to find sysfs cpu topology directory, aborting linux discovery.
+  #     [1684747490.391106] [localhost:14258:0]       tcp_iface.c:837  UCX  ERROR opendir(/sys/class/net) failed: No such file or directory
+  # These messages contaminate test output, which makes the quicktest suite to fail. The patch adds filtering for these messages.
+  patches = [ ./filter_mpi_warnings.patch ];
 
   configureFlags = [
-    "--with-sowing-dir=${sowing}"
-    "--with-hdf5-dir=${hdf5}"
-    "--with-netcdf-dir=${netcdf}"
+    "--with-blas=1"
+    "--with-lapack=1"
+    "--with-scalar-type=${petsc-scalar-type}"
+    "--with-precision=${petsc-precision}"
+    "--with-mpi=${if mpiSupport then "1" else "0"}"
+  ] ++ lib.optionals mpiSupport [
+    "--CC=mpicc"
+    "--with-cxx=mpicxx"
+    "--with-fc=mpif90"
+  ] ++ lib.optionals withMetis [
+    "--with-metis=1"
     "--with-metis-dir=${metis}"
+  ] ++ lib.optionals withParmetis [
+    "--with-parmetis=1"
     "--with-parmetis-dir=${parmetis}"
-    "--with-hypre-dir=${hypre}"
-    "--with-exodusii-dir=${exodus}"
-    "--with-eign-dir=${eigen}"
-    "--with-64-bit-indices"
+  ] ++ lib.optionals withScalapack [
+    "--with-scalapack=1"
+    "--with-scalapack-dir=${scalapack}"
+  ] ++ lib.optionals withMumps [
+    "--with-mumps=1"
+    "--with-mumps-dir=${mumps}"
+  ] ++ lib.optionals petsc-optimized [
+    "--with-debugging=0"
+    "COPTFLAGS=-O3"
+    "FOPTFLAGS=-O3"
+    "CXXOPTFLAGS=-O3"
+    "CXXFLAGS=-O3"
+  ];
+  preConfigure = ''
+    patchShebangs ./lib/petsc/bin
+  '' + lib.optionalString petsc-withp4est ''
+    configureFlagsArray+=(
+      "--with-p4est=1"
+      "--with-zlib-include=${zlib.dev}/include"
+      "--with-zlib-lib=-L${zlib}/lib -lz"
+    )
+  '' + lib.optionalString hdf5-support ''
+    configureFlagsArray+=(
+      "--with-hdf5=1"
+      "--with-hdf5-fortran-bindings=1"
+      "--with-hdf5-include=${hdf5.dev}/include"
+      "--with-hdf5-lib=-L${hdf5}/lib -lhdf5"
+    )
+  '' + lib.optionalString withPtScotch ''
+    configureFlagsArray+=(
+      "--with-ptscotch=1"
+      "--with-ptscotch-include=${ptscotch.dev}/include"
+      "--with-ptscotch-lib=-L${ptscotch.out}/lib -lptscotch -lptesmumps -lptscotchparmetisv3 -lptscotcherr -lesmumps -lscotch -lscotcherr"
+    )
+  '';
+
+  hardeningDisable = lib.optionals (!petsc-optimized) [
+    "fortify"
+    "fortify3"
   ];
 
-  setupHook = writeText "setupHook.sh" "export PETSC_DIR=@out@";
+  configureScript = "python ./configure";
 
-  meta = with stdenv.lib; {
-    homepage = "https://github.com/firedrakeproject/petsc";
-    description = "A suite of data structures and routines for the scalable (parallel) solution of scientific applications modeled by partial differential equations.";
+  enableParallelBuilding = true;
+
+  # This is needed as the checks need to compile and link the test cases with
+  # -lpetsc, which is not available in the checkPhase, which is executed before
+  # the installPhase. The installCheckPhase comes after the installPhase, so
+  # the library is installed and available.
+  doInstallCheck = false;
+  installCheckTarget = "check_install";
+
+  passthru = {
+    inherit mpiSupport;
+  };
+
+  meta = with lib; {
+    description = "Portable Extensible Toolkit for Scientific computation";
+    homepage = "https://petsc.org/release/";
     license = licenses.bsd2;
+    maintainers = with maintainers; [ cburstedde ];
   };
 }

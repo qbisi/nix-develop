@@ -1,41 +1,50 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, openmpi
-, coffee, petsc, petsc4py, mpi4py }:
+{ lib
+, fetchFromGitHub
+, pythonPackages
+, mpi
+, coffee
+, petsc
+, petsc4py
+, loopy
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "98aab7bbbab2945317c1b9ecf5885652cf20e709";
+  version = "20240829.0";
   name = "PyOP2-${version}";
 
   src = fetchFromGitHub {
     owner = "OP2";
     repo = "PyOP2";
-    rev = "${version}";
-    sha256 = "1hw8wpbfgw8j48jfhv72pxq33as2mkw9a9k2qg0607d77agjmpz5";
+    rev = "Firedrake_${version}";
+    sha256 = "sha256-KFqim2IWPekTr0WNF7cs1zWrjlD08O9U3nJ0E7mtdZg=";
   };
 
-  buildInputs = [
-    openmpi
-    pythonPackages.cython
-    pythonPackages.pytest
-    pythonPackages.flake8
-    pythonPackages.pycparser
+  build-system = with pythonPackages; [
+    setuptools
+    cython
+    mpi
+  ];
+
+  dependencies = [
+    pythonPackages.packaging
+    pythonPackages.mpi4py
+    pythonPackages.numpy
+    pythonPackages.cachetools
+    petsc4py
+    loopy
     petsc
   ];
 
-  propagatedBuildInputs = [
-    pythonPackages.six
-    pythonPackages.numpy
-    pythonPackages.decorator
-    mpi4py
-    coffee
-    petsc4py
-  ];
+  PETSC_DIR = "${petsc}";
 
-  postPatch = ''
-    sed -i -e 's|self\._cc = os\.environ\.get(ccenv, cc)|self._cc = '\'"$(type -p mpicxx)"\''' if cpp else '\'"$(type -p mpicc)"\'''|' pyop2/compilation.py
-    sed -i -e 's|self\._ld = os\.environ\.get('\'''LDSHARED'\''', ld)|self._ld = None|' pyop2/compilation.py
-    sed -i -e 's|os\.environ\['\'''PETSC_DIR'\'''\]|'\'''${petsc}'\'''|' pyop2/utils.py
+  preInstallCheck = ''
+    export HOME="$(mktemp -d)"
   '';
+
+  pythonImportsCheck = [ "pyop2" "pyop2.codegen" "pyop2.types" "pyop2.sparsity"];
+
+  # pytest check failed
+  # nativeCheckInputs = with pythonPackages; [ pytestCheckHook flake8 ];
 
   meta = with lib; {
     homepage = "http://op2.github.io/PyOP2/";

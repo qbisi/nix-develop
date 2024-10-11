@@ -27,6 +27,8 @@ pythonPackages.buildPythonPackage rec {
     "ufl.utils"
   ];
 
+  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+
   meta = with lib; {
     homepage = "https://github.com/firedrakeproject/ufl";
     description = "Copy of upstream UFL for use with Firedrake.";

@@ -1,27 +1,39 @@
-{ lib, callPackage, fetchFromGitHub, pythonPackages
-, openmpi, hdf5, petsc }:
+{ lib
+, callPackage
+, pythonPackages
+, mpi
+, petsc
+}:
 
 pythonPackages.buildPythonPackage rec {
-  version = "fbe23a494ab485f44f00ee37eee9f8be8dcd9eb5";
-  name = "firedrake-petsc4py-${version}";
+  inherit (petsc) version src;
+  name = "petsc4py";
 
-  src = fetchFromGitHub {
-    owner = "firedrakeproject";
-    repo = "petsc4py";
-    rev = "${version}";
-    sha256 = "0172rgpyqh2ylr4wv4a79xfls8fbbdb86n4p6r7cx5kdy8d2y05b";
-  };
+  sourceRoot = "source/src/binding/petsc4py";
 
-  buildInputs = [
-    pythonPackages.cython
-    openmpi
-    hdf5
+  build-system = with pythonPackages; [
+    setuptools
+    cython
+    mpi
+  ];
+
+  dependencies = with pythonPackages; [
+    numpy
     petsc
   ];
 
-  propagatedBuildInputs = [
-    pythonPackages.numpy
+  PETSC_DIR = "${petsc}";
+
+  nativeCheckInputs = [
+    pythonPackages.unittestCheckHook
   ];
+
+  unittestFlagsArray = [
+    "-s"
+    "test"
+  ];
+
+  enableParallelBuilding = true;
 
   meta = with lib; {
     homepage = "https://gitlab.com/petsc/petsc4py";

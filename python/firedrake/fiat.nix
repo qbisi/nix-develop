@@ -16,9 +16,17 @@ pythonPackages.buildPythonPackage rec {
     scipy
     sympy
     recursivenodes
+    setuptools
   ];
 
   pythonImportsCheck = [ "FIAT" ];
+
+  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+
+  disabledTestPaths = [
+    # need externel data download
+    "test/regression/"
+  ];
 
   meta = with lib;
     {

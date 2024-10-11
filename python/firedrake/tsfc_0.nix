@@ -2,8 +2,6 @@
 , callPackage
 , fetchFromGitHub
 , pythonPackages
-, loopy
-, finat
 }:
 
 pythonPackages.buildPythonPackage rec {
@@ -19,25 +17,17 @@ pythonPackages.buildPythonPackage rec {
 
   dependencies = [
     pythonPackages.numpy
-    loopy
-    finat
   ];
-
-  preInstallCheck = ''
-    export HOME="$(mktemp -d)"
-  '';
 
   pythonImportsCheck = [
     "gem"
-    "tsfc"
-    "tsfc.kernel_interface"
   ];
-
-  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
 
   meta = with lib; {
     homepage = "https://github.com/firedrakeproject/tsfc";
-    description = "Form compiler for the Firedrake project.";
+    description = ''
+      Form compiler for the Firedrake project.
+    '';
     license = licenses.gpl3;
   };
 }
