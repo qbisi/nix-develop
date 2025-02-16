@@ -1,4 +1,4 @@
-{ newScope, python3, petsc }:
+{ newScope, python3, petsc , mpich }:
 
 let
   # _petsc = (petsc.override {
@@ -18,7 +18,11 @@ let
     pythonPackages = python.pkgs;
     ptscotch = callPackage ./ptscotch.nix { };
     petsc = callPackage ./petsc.nix { };
+    mumps = callPackage ./mumps.nix { };
 
+
+    # mpiBwrapped = callPackage ./mpi-bwrapped.nix { };
+    mpi = mpich;
     ufl = callPackage ./ufl.nix { };
     recursivenodes = callPackage ./recursivenodes.nix { };
     fiat = callPackage ./fiat.nix { };

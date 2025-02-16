@@ -78,6 +78,7 @@ stdenv.mkDerivation rec {
   patches = [ ./filter_mpi_warnings.patch ];
 
   configureFlags = [
+    # "--with-petsc4py=1"
     "--with-blas=1"
     "--with-lapack=1"
     "--with-scalar-type=${petsc-scalar-type}"
@@ -142,7 +143,7 @@ stdenv.mkDerivation rec {
   # -lpetsc, which is not available in the checkPhase, which is executed before
   # the installPhase. The installCheckPhase comes after the installPhase, so
   # the library is installed and available.
-  doInstallCheck = false;
+  doInstallCheck = true;
   installCheckTarget = "check_install";
 
   passthru = {
