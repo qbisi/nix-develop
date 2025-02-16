@@ -12,7 +12,6 @@
     , ...
     }: {
       devShells = {
-        default = config.devShells.python;
         python = pkgs.mkShell
           {
             packages = [

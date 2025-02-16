@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+COMMAND=$1
+shift
+
+case "$COMMAND" in
+    compare)
+        # Check if exactly three arguments are passed
+        if [ $# -ne 3 ]; then
+            echo "Usage: $0 compare <version1> <operator> <version2>"
+            exit 1
+        fi
+
+        VERSION1=$1
+        OPERATOR=$2
+        VERSION2=$3
+
+        # Ensure coreutils are available in NixOS environment
+        if ! command -v sort &>/dev/null; then
+            echo "Error: sort command not found. Ensure coreutils are installed."
+            exit 1
+        fi
+
+        # Function to compare versions using sort -V
+        if [ "$OPERATOR" == "ge" ]; then
+            if [ "$(printf "%s\n%s" "$VERSION2" "$VERSION1" | sort -V | head -n 1)" == "$VERSION2" ]; then
+                true
+            else
+                false
+            fi
+        elif [ "$OPERATOR" == "le" ]; then
+            if [ "$(printf "%s\n%s" "$VERSION1" "$VERSION2" | sort -V | head -n 1)" == "$VERSION1" ]; then
+                true
+            else
+                false
+            fi
+        else
+            echo "Invalid operator. Use 'ge' or 'le'."
+            exit 1
+        fi
+        ;;
+    list)
+        # Return the current kernel version
+        uname -r
+        ;;
+    *)
+        echo "Invalid command. Available commands: compare, list"
+        exit 1
+        ;;
+esac
