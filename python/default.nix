@@ -12,26 +12,28 @@
     , ...
     }: {
       devShells = {
-        default = config.devShells.python;
-        python = pkgs.mkShell
+        petsc4py = pkgs.mkShell
           {
             packages = [
-              ((pkgs.python3.withPackages (python-pkgs: with python-pkgs; [
-                # config.legacyPackages.firedrake.petsc4py
-                config.legacyPackages.firedrake.firedrake
-              ])).override
-              { makeWrapperArgs = [ 
-                "--set PETSC_DIR ${config.legacyPackages.firedrake.petsc}"
-                "--set OMP_NUM_THREADS 1"
-               ]; })
+              (pkgs.python3.withPackages (ps: with ps; [
+                petsc4py
+                # config.legacyPackages.firedrake.firedrake
+              ]))
             ];
-            # shellHook = "zsh && exit 0";
+          };
+        firedrake = pkgs.mkShell
+          {
+            packages = [
+              (pkgs.python3.withPackages (ps: with ps; [
+                config.legacyPackages.firedrakeProject.firedrake
+              ]))
+            ];
           };
       };
       legacyPackages = import ./top-level.nix {
         pkgs = import inputs.nixpkgs {
           inherit system;
-          # config.allowUnfree = true;
+          config.allowUnfree = true;
         };
       };
     };

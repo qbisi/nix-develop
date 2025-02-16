@@ -1,36 +1,51 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, gfortran
-, mpi
-, cmake
-, libspatialindex
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  gfortran,
+  mpi,
+  cmake,
+  ninja,
+  libspatialindex,
+  scikit-build-core,
+  rtree,
 }:
 
-stdenv.mkDerivation rec {
+buildPythonPackage rec {
   pname = "libsupermesh";
-  version = "1.0.1";
+  version = "0-unstable-2024-12-20";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "libsupermesh";
-    rev = "c07de1307e12266707189645fed0f604dab44150";
-    hash = "sha256-qpmasReoqZuNWTt0Pj3WofCRCZrrREp6iSHi6Z1w21o=";
+    rev = "f87cbfdad9edeb12d47118e13564d45f66876322";
+    hash = "sha256-9b5tIfaWQqlbEOjRP4wIkX80jVJshDi1T4ghjk92WuA=";
   };
 
-  nativeBuildInputs = [ gfortran cmake mpi ];
-
-  buildInputs = [ libspatialindex gfortran.cc.lib ];
-
-  cmakeFlags = [
-    "-DBUILD_SHARED_LIBS=ON"
+  build-system = [
+    gfortran
+    cmake
+    ninja
+    mpi
+    scikit-build-core
   ];
 
-  # doCheck = true;
+  dontUseCmakeConfigure = true;
+
+  buildInputs = [
+    libspatialindex
+    gfortran.cc.lib
+  ];
+
+  dependencies = [
+    rtree
+  ];
 
   meta = {
-    description = "Parallel supermeshing library.";
     homepage = "https://github.com/firedrakeproject/libsupermesh";
-    license = with lib.licenses; [ lgpl2 ];
+    description = "Parallel supermeshing library";
+    license = lib.licenses.lgpl2;
+    maintainers = with lib.maintainers; [ qbisi ];
   };
 }

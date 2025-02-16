@@ -1,129 +1,151 @@
-{ lib
-, fetchFromGitHub
-, python3
-, pythonPackages
-, libspatialindex
-, libsupermesh
-, hdf5
-, mpi
-, ufl
-, fiat
-, finat
-, tsfc
-, pyop2
-, petsc
-, petsc4py
-, coffee
-, pyadjoint
-, pytest-mpi
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  fetchPypi,
+  python3,
+
+  # build-system
+  mpi,
+  setuptools,
+  cython,
+  pybind11,
+
+  # dependencies
+  cachetools,
+  decorator,
+  mpi4py,
+  h5py,
+  petsc4py,
+  numpy,
+  packaging,
+  pkgconfig,
+  progress,
+  pycparser,
+  pytools,
+  requests,
+  rtree,
+  scipy,
+  sympy,
+  fenics-ufl,
+  fenics-fiat,
+  pyadjoint-ad,
+  loopy,
+  libsupermesh,
+
+  # lint
+  flake8,
+  pylint,
+
+  # doc
+  sphinx,
+  sphinx-autobuild,
+  sphinxcontrib-bibtex,
+  # not available in nixpkgs
+  # sphinxcontrib-svg2pdfconverter,
+  sphinxcontrib-jquery,
+  bibtexparser,
+  sphinxcontrib-youtube,
+  numpydoc,
+
+  # tests
+  pylit,
+  nbval,
+  pytest,
+  pytest-mpi,
+  pytest-xdist,
+  pytestCheckHook,
+  mpiCheckPhaseHook,
 }:
-pythonPackages.buildPythonPackage rec {
-  version = "20240829.0";
-  name = "firedrake-${version}";
+buildPythonPackage rec {
+  version = "20250218.0";
+  pname = "firedrake";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "firedrake";
-    rev = "Firedrake_${version}";
-    sha256 = "sha256-CR6Aj4RdVvMkMDevJjY9Kl/brFI809DeOLDMXFyRkaQ=";
+    tag = "Firedrake_${version}";
+    sha256 = "sha256-7AYJ1fhXe36V/zrD8aYZz7V/D4G2y2nwxhJ/72in29k=";
   };
 
-  build-system = with pythonPackages; [
+  build-system = [
+    decorator # This duplicated decorator ensures decorator-4.4.2 take predence
     mpi
+    setuptools
     cython
+    pybind11
   ];
 
-  dependencies = with pythonPackages; [
-    libspatialindex
-    libsupermesh
-    hdf5
+  dependencies = [
+    decorator
+    cachetools
+    mpi4py
+    h5py
+    petsc4py
     numpy
+    packaging
+    pkgconfig
+    progress
+    pycparser
+    pytools
+    requests
+    rtree
     scipy
     sympy
-    rtree
-    pybind11
-    h5py
-    progress
-    # pythonPackages.six
-    # pythonPackages.sympy
-    # pythonPackages.psutil
-    # pythonPackages.cachetools
-    # pythonPackages.singledispatch
-    # pythonPackages.ipython
-    # pythonPackages.matplotlib
-    ufl
-    fiat
-    finat
-    tsfc
-    pyop2
-    petsc
-    petsc4py
-    coffee
-    pyadjoint
+    fenics-ufl
+    fenics-fiat
+    pyadjoint-ad
+    loopy
+    libsupermesh
   ];
 
-  PETSC_DIR = "${petsc}";
+  optional-dependencies = {
+    dev = [
+      flake8
+      pylint
+    ];
 
-  configuration = builtins.toJSON {
-    options = {
-      # package_manager = true;
-      # minimal_petsc = false;
-      # mpicc = null;
-      # mpicxx = null;
-      # mpif90 = null;
-      # mpiexec = null;
-      # disable_ssh = true;
-      honour_petsc_dir = true;
-      # with_parmetis = true;
-      # slepc = false;
-      # packages = [ ];
-      # honour_pythonpath = true;
-      # opencascade = false;
-      # tinyasm = false;
-      # petsc_int_type = "int32";
-      cache_dir = "/tmp/firedrake";
-      complex = false;
-      # remove_build_files = false;
-      # with_blas = null;
-      # torch = false;
-      # netgen = false;
-    };
-    # environment = { };
-    # additions = [ ];
+    test = [
+      pylit
+      nbval
+      pytest
+      pytest-mpi
+      pytest-xdist
+    ];
+
+    docs = [
+      sphinx
+      sphinx-autobuild
+      sphinxcontrib-bibtex
+      # not available in nixpkgs
+      # sphinxcontrib-svg2pdfconverter
+      sphinxcontrib-jquery
+      bibtexparser
+      sphinxcontrib-youtube
+      numpydoc
+    ];
   };
 
-  passAsFile = [ "configuration" ];
-
-  preInstallCheck = ''
-    cd $out
-    install -Dm 644 $configurationPath $out/${python3.sitePackages}/firedrake_configuration/configuration.json
+  preInstall = ''
     export HOME="$(mktemp -d)"
   '';
 
-  pythonImportsCheck = [
-    "firedrake"
-  ];
+  pythonImportsCheck = [ "firedrake" ];
 
-  # doCheck = false;
+  doCheck = false;
 
-  pytestFlagsArray = [
-    # "--numprocesses=$NIX_BUILD_CORES"
-    # "$OLDPWD/tests/multigrid/"
-  ];
+  disabledTests = [ ];
 
-  disabledTests = [
-    # "test_multi_space_transfer"
-  ];
+  nativeCheckInputs = [ pytestCheckHook ] ++ optional-dependencies.test;
 
-  nativeCheckInputs = with pythonPackages; [
-    # pytestCheckHook
-    # pytest-mpi
-    # pytest-xdist
-  ];
+  nativeInstallCheckInputs = [ mpiCheckPhaseHook ];
 
-  meta = with lib; {
+  meta = {
     homepage = "http://www.firedrakeproject.org";
-    description = "Firedrake is an automated system for the portable solution of partial differential equations using the finite element method (FEM).";
-    license = licenses.lgpl3;
+    description = "Automated system for the portable solution of partial differential equations using the finite element method (FEM)";
+    changelog = "https://github.com/firedrakeproject/firedrake/releases/tag/${src.tag}";
+    license = lib.licenses.lgpl3;
+    maintainers = with lib.maintainers; [ qbisi ];
   };
 }

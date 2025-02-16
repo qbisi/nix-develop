@@ -1,37 +1,41 @@
-{ lib
-, fetchFromGitHub
-, pythonPackages
+{
+  lib,
+  fetchFromGitHub,
+  buildPythonPackage,
+  setuptools,
+  numpy,
+  pytestCheckHook,
 }:
 
-pythonPackages.buildPythonPackage rec {
-  version = "1.0.3";
-  name = "checkpoint_schedules";
+buildPythonPackage rec {
+  version = "1.0.4";
+  pname = "checkpoint-schedules";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "checkpoint_schedules";
-    rev = "v${version}";
-    sha256 = "sha256-yiuUvK0BwulMBKgBZBpdjHOZk50IzSuoxsOMFoIVuWI=";
+    tag = "v${version}";
+    sha256 = "sha256-3bn/KxxtRLRtOHFeULQdnndonpuhuYLL8/y/zoAurzY=";
   };
 
-  build-system = with pythonPackages; [
-    setuptools
-  ];
+  build-system = [ setuptools ];
 
   dependencies = [
-    pythonPackages.numpy
+    numpy
   ];
 
   pythonImportsCheck = [
     "checkpoint_schedules"
   ];
 
-  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/firedrakeproject/checkpoint_schedules";
     description = "Provides schedules for step-based incremental checkpointing of the adjoints to computer models";
-    license = licenses.lgpl3;
+    changelog = "https://github.com/firedrakeproject/checkpoint_schedules/releases/tag/${src.tag}";
+    license = lib.licenses.lgpl3;
+    maintainers = with lib.maintainers; [ qbisi ];
   };
 }

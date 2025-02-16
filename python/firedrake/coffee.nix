@@ -1,35 +1,47 @@
-{ lib
-, callPackage
-, fetchFromGitHub
-, pythonPackages
-, pulp
+{
+  lib,
+  callPackage,
+  fetchFromGitHub,
+  buildPythonPackage,
+  networkx,
+  numpy,
+  six,
+  pulp,
+  pytestCheckHook,
 }:
 
-pythonPackages.buildPythonPackage rec {
+# Mark Obsolete
+
+buildPythonPackage rec {
   version = "20230510.0";
-  name = "firedrake-COFFEE-${version}";
+  pname = "coffee";
 
   src = fetchFromGitHub {
     owner = "coneoproject";
     repo = "COFFEE";
-    rev = "Firedrake_${version}";
+    tag = "Firedrake_${version}";
     sha256 = "sha256-av3JLE6o4v3VhJKMm5FiWjtdb3mRBZ1Xhjz2CkUCa5A=";
   };
 
-  dependencies = with pythonPackages; [
+  dependencies = [
     networkx
     numpy
     six
     pulp
   ];
 
-  pythonImportsCheck = [ "coffee" "coffee.visitors" ];
+  pythonImportsCheck = [
+    "coffee"
+    "coffee.visitors"
+  ];
 
-  nativeCheckInputs = with pythonPackages; [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/coneoproject/COFFEE";
-    description = "A COmpiler For Fast Expression Evaluation (COFFEE).";
-    license = licenses.bsd3;
+    description = "COmpiler For Fast Expression Evaluation (COFFEE)";
+    changelog = "https://github.com/coneoproject/COFFEE/releases/tag/${src.tag}";
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ qbisi ];
   };
 }

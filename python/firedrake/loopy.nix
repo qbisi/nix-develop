@@ -1,32 +1,50 @@
-{ lib, fetchFromGitHub, pythonPackages }:
+{
+  lib,
+  fetchFromGitHub,
+  buildPythonPackage,
+  hatchling,
+  constantdict,
+  codepy,
+  cgen,
+  colorama,
+  genpy,
+  islpy,
+  mako,
+  numpy,
+  pymbolic,
+  pyopencl,
+  pytools,
+  typing-extensions,
+  pytestCheckHook,
+}:
 
-pythonPackages.buildPythonPackage rec {
-  version = "20240829.0";
-  name = "firedrake-loopy-${version}";
+buildPythonPackage rec {
+  version = "20250218.0";
+  name = "firedrake-loopy";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "loopy";
-    rev = "Firedrake_${version}";
-    sha256 = "sha256-45iq3H+HW8oMqKN6mP2abGuQ9M66yiiZHfP5VTpPJu0=";
-    fetchSubmodules = true;
+    tag = "Firedrake_${version}";
+    sha256 = "sha256-QSGLIex5meGHqJvJWAEcSB74mRxJwRh1/5a0auGJXd0=";
   };
 
-  build-system = with pythonPackages; [ setuptools ];
+  build-system = [
+    hatchling
+  ];
 
-  dependencies = with pythonPackages; [
+  dependencies = [
+    constantdict
     codepy
     cgen
     colorama
     genpy
-    immutables
     islpy
     mako
     numpy
     pymbolic
     pyopencl
-    pyrsistent
     pytools
     typing-extensions
   ];
@@ -37,9 +55,16 @@ pythonPackages.buildPythonPackage rec {
 
   pythonImportsCheck = [ "loopy" ];
 
-  meta = with lib; {
+  # pyopencl._cl.LogicError: clGetPlatformIDs failed: PLATFORM_NOT_FOUND_KHR
+  doCheck = false;
+
+  nativeCheckInputs = [ pytestCheckHook ];
+
+  meta = {
     homepage = "https://github.com/firedrakeproject/loopy";
-    description = "Copy of upstream loopy for use with Firedrake.";
-    license = licenses.mit;
+    description = "Copy of upstream loopy for use with Firedrake";
+    changelog = "https://github.com/firedrakeproject/loopy/releases/tag/${src.tag}";
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ qbisi ];
   };
 }
