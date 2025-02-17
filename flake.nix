@@ -61,6 +61,7 @@
                 agenix-cli
                 inputs'.colmena.packages.colmena
               ];
+              shellHook = ''alias colmena="colmena --experimental-flake-eval"'';
             };
 
             tex = {
