@@ -1,4 +1,13 @@
 {
+  nixConfig = {
+    extra-substituters = [
+      "https://colmena.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "colmena.cachix.org-1:7BzpDnjjH8ki2CT3f6GdOk7QAzPOl+1t3LvTLXqYcSg="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # nixpkgs.url = "/home/qbisi/nixpkgs";
@@ -9,6 +18,9 @@
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    colmena = {
+      url = "github:zhaofengli/colmena";
     };
   };
 
@@ -28,6 +40,7 @@
           config,
           pkgs,
           system,
+          inputs',
           ...
         }:
         {
@@ -46,7 +59,7 @@
             nixos-config = {
               packages = with pkgs; [
                 agenix-cli
-                colmena
+                inputs'.colmena.packages.colmena
               ];
             };
 
