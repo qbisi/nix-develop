@@ -3,15 +3,15 @@
   buildPythonPackage,
   fetchFromGitHub,
   fetchPypi,
-  python3,
+  python,
 
   # build-system
-  mpi,
   setuptools,
   cython,
   pybind11,
 
   # dependencies
+  mpi,
   cachetools,
   decorator,
   mpi4py,
@@ -71,13 +71,13 @@ buildPythonPackage rec {
 
   build-system = [
     decorator # This duplicated decorator ensures decorator-4.4.2 take predence
-    mpi
     setuptools
     cython
     pybind11
   ];
 
   dependencies = [
+    mpi
     decorator
     cachetools
     mpi4py
@@ -99,6 +99,9 @@ buildPythonPackage rec {
     loopy
     libsupermesh
   ];
+
+  # user need the mpi compiler mpicc to compile the generated code
+  propagatedUserEnvPkgs = [ (lib.getDev mpi) ];
 
   optional-dependencies = {
     dev = [
@@ -127,18 +130,20 @@ buildPythonPackage rec {
     ];
   };
 
-  preInstall = ''
+  postInstall = ''
     export HOME="$(mktemp -d)"
   '';
 
-  pythonImportsCheck = [ "firedrake" ];
-
+  #ImportError: cannot import name 'sparsity' from partially initialized modules
   doCheck = false;
 
-  disabledTests = [ ];
+  nativeCheckInputs = [
+    pytestCheckHook
+    mpiCheckPhaseHook
+  ] ++ optional-dependencies.test;
 
-  nativeCheckInputs = [ pytestCheckHook ] ++ optional-dependencies.test;
 
+  pythonImportsCheck = [ "firedrake" ];
   nativeInstallCheckInputs = [ mpiCheckPhaseHook ];
 
   meta = {

@@ -27,7 +27,8 @@ buildPythonPackage rec {
     owner = "firedrakeproject";
     repo = "loopy";
     tag = "Firedrake_${version}";
-    sha256 = "sha256-QSGLIex5meGHqJvJWAEcSB74mRxJwRh1/5a0auGJXd0=";
+    sha256 = "sha256-2DaRhSXnvmjcRm1YNKn6sj6iZAfQCRLbIr1naKGb0kw=";
+    fetchSubmodules = true; # submodule at `loopy/target/c/compyte`
   };
 
   build-system = [

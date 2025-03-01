@@ -24,8 +24,11 @@
         firedrake = pkgs.mkShell
           {
             packages = [
-              (pkgs.python3.withPackages (ps: with ps; [
+              (pkgs.jupyter.withPackages (ps: with ps; [
                 config.legacyPackages.firedrakeProject.firedrake
+                matplotlib
+                pytest
+                vtk
               ]))
             ];
           };

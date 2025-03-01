@@ -24,6 +24,9 @@ let
     irksome = callPackage ./irksome.nix { };
     constantdict = callPackage ./constantdict.nix { };
     pylit = callPackage ./pylit.nix { };
+    siphash24 = callPackage ./siphash24.nix { };
+    libcsiphash = callPackage ./libcsiphash.nix { };
+    libcstdaux = callPackage ./libcstdaux.nix { };
   };
 in
 firedrakeProject
