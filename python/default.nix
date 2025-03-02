@@ -33,6 +33,10 @@
                 ipykernel
               ]))
             ];
+
+            shellHook = ''
+              export OMP_NUM_THREADS=1
+            '';
           };
       };
       legacyPackages = import ./top-level.nix {
