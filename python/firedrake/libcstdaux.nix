@@ -29,6 +29,7 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "https://github.com/c-util/c-stdaux";
     description = "Auxiliary macros and functions for the C standard library";
+    changelog = "https://github.com/c-util/c-stdaux/releases/tag/${src.tag}";
     license = with lib.licenses; [
       asl20
       lgpl2Plus

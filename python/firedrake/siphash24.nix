@@ -8,6 +8,7 @@
   pkg-config,
   pkgconfig,
   libcsiphash,
+  libcstdaux,
 }:
 
 buildPythonPackage rec {
@@ -32,6 +33,7 @@ buildPythonPackage rec {
 
   buildInputs = [
     libcsiphash
+    libcstdaux
   ];
 
   pythonImportsCheck = [
