@@ -27,6 +27,7 @@ let
     siphash24 = callPackage ./siphash24.nix { };
     libcsiphash = callPackage ./libcsiphash.nix { };
     libcstdaux = callPackage ./libcstdaux.nix { };
+    mpi-pytest = callPackage ./mpi-pytest.nix { };
   };
 in
 firedrakeProject
