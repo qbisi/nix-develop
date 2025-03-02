@@ -28,7 +28,9 @@ buildPythonPackage rec {
 
   # Hash value equals on each Python execution in sandbox environment
   # https://github.com/matthiasdiener/constantdict/blob/49149a3049e99390fead424be58e9fa89120d781/test/test_pickle.py#L100
-  doCheck = false;
+  disabledTests = [
+    "test_pickle"
+  ];
 
   nativeCheckInputs = [ pytestCheckHook ];
 

@@ -6,9 +6,9 @@
   meson-python,
   cython,
   pkg-config,
-  pkgconfig,
   libcsiphash,
   libcstdaux,
+  unittestCheckHook,
 }:
 
 buildPythonPackage rec {
@@ -28,7 +28,6 @@ buildPythonPackage rec {
     meson-python
     cython
     pkg-config
-    pkgconfig
   ];
 
   buildInputs = [
@@ -40,11 +39,12 @@ buildPythonPackage rec {
     "siphash24"
   ];
 
-  doCheck = true;
+  nativeCheckInputs = [ unittestCheckHook ];
 
   meta = {
     homepage = "https://github.com/dnicolodi/python-siphash24";
     description = "Streaming-capable SipHash Implementation";
+    changelog = "https://github.com/dnicolodi/python-siphash24/releases/tag/${src.tag}";
     license = lib.licenses.lgpl2Plus;
     maintainers = with lib.maintainers; [ qbisi ];
   };
