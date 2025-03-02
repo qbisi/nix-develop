@@ -9,9 +9,9 @@
   setuptools,
   cython,
   pybind11,
+  mpi,
 
   # dependencies
-  mpi,
   cachetools,
   decorator,
   mpi4py,
@@ -54,6 +54,7 @@
   pytest,
   pytest-mpi,
   pytest-xdist,
+  pytest-timeout,
   pytestCheckHook,
   mpiCheckPhaseHook,
 }:
@@ -69,15 +70,28 @@ buildPythonPackage rec {
     sha256 = "sha256-7AYJ1fhXe36V/zrD8aYZz7V/D4G2y2nwxhJ/72in29k=";
   };
 
+  postPatch = ''
+    substituteInPlace pyproject.toml --replace-fail \
+      "decorator<=4.4.2" \
+      "decorator"
+  '';
+
   build-system = [
-    decorator # This duplicated decorator ensures decorator-4.4.2 take predence
+    (decorator.overrideAttrs rec {
+      pname = "decorator";
+      version = "4.4.2";
+      src = fetchPypi {
+        inherit pname version;
+        hash = "sha256-46YvBSAXJEDKDcyCN0kxk4Ljd/N/FAoLme9F/suEv+c=";
+      };
+    })
     setuptools
     cython
     pybind11
+    mpi
   ];
 
   dependencies = [
-    mpi
     decorator
     cachetools
     mpi4py
@@ -100,8 +114,11 @@ buildPythonPackage rec {
     libsupermesh
   ];
 
-  # user need the mpi compiler mpicc to compile the generated code
-  propagatedUserEnvPkgs = [ (lib.getDev mpi) ];
+  # user need mpicc/mpiexec to compile/run the generated code
+  propagatedUserEnvPkgs = [
+    mpi
+    (lib.getDev mpi)
+  ];
 
   optional-dependencies = {
     dev = [
@@ -115,6 +132,7 @@ buildPythonPackage rec {
       pytest
       pytest-mpi
       pytest-xdist
+      pytest-timeout
     ];
 
     docs = [
@@ -130,21 +148,34 @@ buildPythonPackage rec {
     ];
   };
 
-  postInstall = ''
-    export HOME="$(mktemp -d)"
-  '';
+  # postInstall = ''
+  #   export HOME="$(mktemp -d)"
+  # '';
 
   #ImportError: cannot import name 'sparsity' from partially initialized modules
-  doCheck = false;
-
-  nativeCheckInputs = [
-    pytestCheckHook
-    mpiCheckPhaseHook
-  ] ++ optional-dependencies.test;
-
-
   pythonImportsCheck = [ "firedrake" ];
-  nativeInstallCheckInputs = [ mpiCheckPhaseHook ];
+
+  doCheck = true;
+
+  nativeCheckInputs = [ mpiCheckPhaseHook ] ++ propagatedUserEnvPkgs ++ optional-dependencies.test;
+
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    export HOME=$(mktemp -d)
+    cd tests
+    echo "testing firedrake ..."
+    pytest -n auto --tb=native --timeout=480 --timeout-method=thread -o faulthandler_timeout=540 -v firedrake
+    echo "testing tsfc ..."
+    pytest -n auto --tb=native --timeout=480 --timeout-method=thread -o faulthandler_timeout=540 -v tsfc
+    echo "testing pyop2 ..."
+    pytest -n auto -m "not parallel" --tb=native --timeout=480 --timeout-method=thread -o faulthandler_timeout=540 -v pyop2
+    mpiexec -n 2 pytest -m "parallel[2]" --tb=native --timeout=480 --timeout-method=thread -o faulthandler_timeout=540 -v pyop2
+    mpiexec -n 3 pytest -m "parallel[3]" --tb=native --timeout=480 --timeout-method=thread -o faulthandler_timeout=540 -v pyop2
+    cd ..
+
+    runHook postInstallCheck
+  '';
 
   meta = {
     homepage = "http://www.firedrakeproject.org";

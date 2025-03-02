@@ -4,14 +4,14 @@ let
   callPackage = pythonPackages.newScope firedrakeProject;
   firedrakeProject = rec {
     # mpi = mpich;
-    decorator = pythonPackages.decorator.overrideAttrs rec {
-      pname = "decorator";
-      version = "4.4.2";
-      src = pythonPackages.fetchPypi {
-        inherit pname version;
-        hash = "sha256-46YvBSAXJEDKDcyCN0kxk4Ljd/N/FAoLme9F/suEv+c=";
-      };
-    };
+    # decorator = pythonPackages.decorator.overrideAttrs rec {
+    #   pname = "decorator";
+    #   version = "4.4.2";
+    #   src = pythonPackages.fetchPypi {
+    #     inherit pname version;
+    #     hash = "sha256-46YvBSAXJEDKDcyCN0kxk4Ljd/N/FAoLme9F/suEv+c=";
+    #   };
+    # };
     fenics-ufl = callPackage ./fenics-ufl.nix { };
     fenics-fiat = callPackage ./fenics-fiat.nix { };
     pyadjoint-ad = callPackage ./pyadjoint-ad.nix { };

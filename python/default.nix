@@ -26,9 +26,11 @@
             packages = [
               (pkgs.jupyter.withPackages (ps: with ps; [
                 config.legacyPackages.firedrakeProject.firedrake
+                config.legacyPackages.firedrakeProject.siphash24
                 matplotlib
                 pytest
                 vtk
+                ipykernel
               ]))
             ];
           };
