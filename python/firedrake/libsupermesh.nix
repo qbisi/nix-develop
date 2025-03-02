@@ -13,14 +13,14 @@
 
 buildPythonPackage rec {
   pname = "libsupermesh";
-  version = "0-unstable-2024-12-20";
+  version = "2025.3.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "firedrakeproject";
     repo = "libsupermesh";
-    rev = "f87cbfdad9edeb12d47118e13564d45f66876322";
-    hash = "sha256-9b5tIfaWQqlbEOjRP4wIkX80jVJshDi1T4ghjk92WuA=";
+    tag = "v${version}";
+    hash = "sha256-RKBi89bUhkbRATaSB8629D+/NeYE3YNDIMEGzSK8z04=";
   };
 
   build-system = [
@@ -42,10 +42,14 @@ buildPythonPackage rec {
     rtree
   ];
 
+  # backend scikit-build-core does not run cmake tests
+  doCheck = false;
+
   meta = {
     homepage = "https://github.com/firedrakeproject/libsupermesh";
     description = "Parallel supermeshing library";
-    license = lib.licenses.lgpl2;
+    changelog = "https://github.com/firedrakeproject/libsupermesh/releases/tag/${src.tag}";
+    license = lib.licenses.lgpl2Plus;
     maintainers = with lib.maintainers; [ qbisi ];
   };
 }
