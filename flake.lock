@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1738453229,
-        "narHash": "sha256-7H9XgNiGLKN1G1CgRh0vUL4AheZSYzPm+zmZ7vxbJdo=",
+        "lastModified": 1740872218,
+        "narHash": "sha256-ZaMw0pdoUKigLpv9HiNDH2Pjnosg7NBYMJlHTIsHEUo=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "32ea77a06711b758da0ad9bd6a844c5740a87abd",
+        "rev": "3876f6b87db82f33775b1ef5ea343986105db764",
         "type": "github"
       },
       "original": {
@@ -22,16 +22,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1740779068,
-        "narHash": "sha256-dSZohRk49r9xWhiZcoioaaq8UF7IxWskROThfoNAxtg=",
+        "lastModified": 1740929687,
+        "narHash": "sha256-TUCOa/vo8OLMjXx4NLiDJXn1MomVlCvD6X8jx/0X1Ac=",
         "owner": "qbisi",
         "repo": "nixpkgs",
-        "rev": "09e1433c102fc0131e165d9cb82bfe81ff836cd8",
+        "rev": "e9778aeccae81de408dcfd449b185ce2d4d0ed56",
         "type": "github"
       },
       "original": {
         "owner": "qbisi",
-        "ref": "petsc",
+        "ref": "petsc-latest",
         "repo": "nixpkgs",
         "type": "github"
       }

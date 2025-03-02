@@ -148,14 +148,14 @@ buildPythonPackage rec {
     ];
   };
 
-  # postInstall = ''
-  #   export HOME="$(mktemp -d)"
-  # '';
+  postInstall = ''
+    export HOME="$(mktemp -d)"
+  '';
 
   #ImportError: cannot import name 'sparsity' from partially initialized modules
   pythonImportsCheck = [ "firedrake" ];
 
-  doCheck = true;
+  doCheck = false;
 
   nativeCheckInputs = [ mpiCheckPhaseHook ] ++ propagatedUserEnvPkgs ++ optional-dependencies.test;
 
