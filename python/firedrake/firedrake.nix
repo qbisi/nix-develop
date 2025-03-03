@@ -52,7 +52,7 @@
   pylit,
   nbval,
   pytest,
-  pytest-mpi,
+  mpi-pytest,
   pytest-xdist,
   pytest-timeout,
   pytestCheckHook,
@@ -130,7 +130,7 @@ buildPythonPackage rec {
       pylit
       nbval
       pytest
-      pytest-mpi
+      mpi-pytest
       pytest-xdist
       pytest-timeout
     ];

@@ -52,7 +52,7 @@
 
           shellHook = ''
             export OMP_NUM_THREADS=1
-            export VIRTUAL_ENV=$PWD
+            export VIRTUAL_ENV=$HOME
           '';
         };
       };

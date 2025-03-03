@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  fetchpatch,
   buildPythonPackage,
   setuptools,
   mpi4py,
@@ -19,13 +20,23 @@ buildPythonPackage rec {
     owner = "firedrakeproject";
     repo = "mpi-pytest";
     tag = "v${version}";
-    sha256 = "sha256-8VRzLK5RrRgmdkBFLAcG2Ehf/4qKpj1j4FymfmGgTZg=";
+    hash = "sha256-8VRzLK5RrRgmdkBFLAcG2Ehf/4qKpj1j4FymfmGgTZg=";
   };
 
-  build-system = [ setuptools ];
+  patches = [
+    # This commit added some basic test examples
+    (fetchpatch {
+      name = "changing-to-boolea-argument";
+      url = "https://github.com/firedrakeproject/mpi-pytest/commit/b94617b428ce33df85e9ea5ce8bed1e0bf295a34.patch";
+      hash = "sha256-nwaA6mB5AKcEbXte0TYp7hthnzjotW+ujFJ224A1Tvg=";
+    })
+  ];
+
+  build-system = [
+    setuptools
+  ];
 
   dependencies = [
-    mpi
     mpi4py
     pytest
   ];
@@ -41,12 +52,13 @@ buildPythonPackage rec {
   nativeCheckInputs = [
     pytestCheckHook
     mpiCheckPhaseHook
+    mpi
   ];
 
-  doCheck = false;
-
   pytestCheckPhase = ''
+    pytest -m "not parallel or parallel[1]"
     mpiexec -n 2 pytest -m "parallel[2]"
+    mpiexec -n 3 pytest -m "parallel[3]"
   '';
 
   meta = {
