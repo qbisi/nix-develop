@@ -12,6 +12,7 @@ let
     #     hash = "sha256-46YvBSAXJEDKDcyCN0kxk4Ljd/N/FAoLme9F/suEv+c=";
     #   };
     # };
+    h5py = pythonPackages.h5py.override { hdf5 = pythonPackages.pkgs.hdf5-fortran-mpi; };
     fenics-ufl = callPackage ./fenics-ufl.nix { };
     fenics-fiat = callPackage ./fenics-fiat.nix { };
     pyadjoint-ad = callPackage ./pyadjoint-ad.nix { };
