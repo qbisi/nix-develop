@@ -6,6 +6,7 @@
   python,
 
   # build-system
+  build,
   setuptools,
   cython,
   pybind11,
@@ -50,7 +51,7 @@
 
   # tests
   ipympl,
-  pytest-split,
+  # pytest-split,
   pylit,
   nbval,
   pytest,
@@ -124,8 +125,12 @@ buildPythonPackage rec {
 
   optional-dependencies = {
     dev = [
-      flake8
-      pylint
+      build
+      cython
+      mpi-pytest
+      pybind11
+      pytest
+      setuptools
     ];
 
     test = [
@@ -136,7 +141,7 @@ buildPythonPackage rec {
       pytest-xdist
       pytest-timeout
       ipympl # needed for notebook testing
-      pytest-split  # needed for firedrake-run-split-tests
+      # pytest-split  # needed for firedrake-run-split-tests
     ];
 
     docs = [

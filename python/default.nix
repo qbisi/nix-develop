@@ -45,7 +45,9 @@
                 pytest
                 vtk
                 ipykernel
+                pip
               ]
+              ++ config.legacyPackages.firedrakeProject.firedrake.optional-dependencies.dev
               ++ config.legacyPackages.firedrakeProject.firedrake.optional-dependencies.test
             ))
             pkgs.blas
