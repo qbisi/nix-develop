@@ -49,6 +49,8 @@
   numpydoc,
 
   # tests
+  ipympl,
+  pytest-split,
   pylit,
   nbval,
   pytest,
