@@ -48,6 +48,8 @@
               ]
               ++ config.legacyPackages.firedrakeProject.firedrake.optional-dependencies.test
             ))
+            pkgs.blas
+            pkgs.lapack
           ];
 
           shellHook = ''
