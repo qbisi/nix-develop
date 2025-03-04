@@ -133,6 +133,8 @@ buildPythonPackage rec {
       mpi-pytest
       pytest-xdist
       pytest-timeout
+      ipympl # needed for notebook testing
+      pytest-split  # needed for firedrake-run-split-tests
     ];
 
     docs = [
